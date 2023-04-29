@@ -80,6 +80,8 @@ def main(opts):
         matrices_regions[j] = gt_matrix
         distances_regions[j] = dist_vec
 
+    suffix = opts.suffix
+        
     np.save("matrices_"+suffix, matrices)
     np.save("distances_"+suffix, distances)
     
@@ -176,18 +178,22 @@ def load_recos(reco_path):
     recos_lst = open(reco_path).readlines()
     assert len(recos_lst) == 1
 
-    values = [float(x) for x in recos_lst[0].split(',')]
+    recos_split = recos_lst[0].split(',')[:-1]
+    
+    values = [float(x) for x in recos_split]
     return np.array(values)
 
 def parse_args():
+    # TODO: mandatories, help message
+    
     parser = optparse.OptionParser(description='process_trees entry point')
 
     parser.add_option('-i', '--infile', type='string',
         help='text file containing a newline separated list of .trees files to process')
-    parser.add_option('-o', '--out', type='string', help='suffix for outfiles')
-    parser.add_option('-r', '--reco', type='string',
+    parser.add_option('-o', '--suffix', type='string', help='suffix for outfiles')
+    parser.add_option('-r', '--reco_path', type='string',
         help='path to comma-separated text file containing recombination rate values')
-    parser.add_option('-a', '--Ne', type='string',help='ancestral size')
+    parser.add_option('-a', '--Ne', type='int',help='ancestral size')
     parser.add_option('-s', '--seed', type='int', default=1833,
         help='seed for RNG')
     parser.add_option('-m', '--mut', type='int', default=1.25e-8, help='mutation rate value')
