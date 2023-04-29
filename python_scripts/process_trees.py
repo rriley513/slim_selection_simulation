@@ -1,24 +1,22 @@
 import msprime
 import numpy as np
+import optparse
 import pyslim
 import sys
 import tskit
 
 import global_vars
 
-# TODO: optparse for Ne, reco_path, use default value for mut
-
-num_haps = 198
+num_haps = global_vars.DEFAULT_SAMPLE_SIZE # TODO get this from data
 num_inds = num_haps//2 # dihaploid
 
-def main(filelist, SUFFIX):
-    # TODO: output N recombination rates to a file, read those in
+def main(opts):
+    reco_values = load_recos(opts.reco_path)
 
-    files = open(filelist, 'r').readlines()
+    files = open(opts.infile, 'r').readlines()
     n_regions = len(files)
     n_range = range(n_regions)
-    # TODO: reco values numpy array will be created specifically for the tree set
-    reco_values = np.load(reco_values_path) 
+     
     # (N, 36, 198)
     matrices = np.zeros((n_regions, global_vars.NUM_SNPS, num_haps))
     distances = np.zeros((n_regions, global_vars.NUM_SNPS))
@@ -37,7 +35,7 @@ def main(filelist, SUFFIX):
         use_selection = "sel" in file_name
 
         ts = pyslim.update(tskit.load(file_name))
-        ts = clean_tree(ts, use_selection)
+        ts = clean_tree(ts, reco, opts, use_selection)
 
         gt_matrix = ts.genotype_matrix()
         num_snps_present = gt_matrix.shape[0]
@@ -82,24 +80,24 @@ def main(filelist, SUFFIX):
         matrices_regions[j] = gt_matrix
         distances_regions[j] = dist_vec
 
-    np.save("matrices_"+SUFFIX, matrices)
-    np.save("distances_"+SUFFIX, distances)
+    np.save("matrices_"+suffix, matrices)
+    np.save("distances_"+suffix, distances)
     
-    np.save("matrices_regions_"+SUFFIX, matrices_regions)
-    np.save("distances_regions_"+SUFFIX, distances_regions)    
+    np.save("matrices_regions_"+suffix, matrices_regions)
+    np.save("distances_regions_"+suffix, distances_regions)    
     
 '''
 necessary step. Do not remove.
 '''
-def clean_tree(ts, selection):
-    ts_recap = pyslim.recapitate(ts, recombination_rate=params["reco"],
-                                 ancestral_Ne=params["Ne"])
+def clean_tree(ts, reco, opts, selection):
+    ts_recap = pyslim.recapitate(ts, recombination_rate=reco,
+                                 ancestral_Ne=opts.Ne)
 
     if selection:
         ts_simplified = simplify_selection_tree(ts_recap)
     else:
         ts_simplified = simplify_tree(ts_recap)
-    ts_mutated = msprime.mutate(ts_simplified, rate=params["mut"], keep=True)
+    ts_mutated = msprime.mutate(ts_simplified, rate=opts.mut, keep=True)
     return ts_mutated
 
 '''
@@ -125,7 +123,9 @@ def simplify_selection_tree(ts_recap):
         tries += 1
         ts_simplified = simplify_tree(ts_recap)
         num_muts = ts_simplified.genotype_matrix().shape[0]
-        print(tries)
+
+    if tries > 1:
+        print(tries, "------------------------------")
 
     return ts_simplified
 
@@ -172,12 +172,33 @@ def center_pad(gt_matrix, dist_vec, num_snps_present, S):
 
     return new_matrix, new_dist
 
+def load_recos(reco_path):
+    recos_lst = open(reco_path).readlines()
+    assert len(recos_lst) == 1
+
+    values = [float(x) for x in recos_lst[0].split(',')]
+    return np.array(values)
+
+def parse_args():
+    parser = optparse.OptionParser(description='process_trees entry point')
+
+    parser.add_option('-i', '--infile', type='string',
+        help='text file containing a newline separated list of .trees files to process')
+    parser.add_option('-o', '--out', type='string', help='suffix for outfiles')
+    parser.add_option('-r', '--reco', type='string',
+        help='path to comma-separated text file containing recombination rate values')
+    parser.add_option('-a', '--Ne', type='string',help='ancestral size')
+    parser.add_option('-s', '--seed', type='int', default=1833,
+        help='seed for RNG')
+    parser.add_option('-m', '--mut', type='int', default=1.25e-8, help='mutation rate value')
+
+    (opts, args) = parser.parse_args()
+
+    return opts
+
 if __name__ == "__main__":
-    # test_center_pad()
-    # test_trim_matrix()
-
-    filelist = sys.argv[1]
-
-    SUFFIX = sys.argv[2]
+    # filelist = sys.argv[1]
+    # reco_rates = sys.argv[2]
+    # suffix = sys.argv[3]
     
-    main(filelist, SUFFIX)
+    main(parse_args())

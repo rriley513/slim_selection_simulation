@@ -14,8 +14,8 @@ SELECTION_STRENGTH=$7
 function run_slim(){
     nohup slim -d reco=${RECOS[i]} -d N1=${PARAMS[0]} -d N2=${PARAMS[1]} \
         -d growth=${PARAMS[2]} -d T1=${PARAMS[3]} -d T2=${PARAMS[4]} \
-        -d outfolder=\"$OUTFOLDER\" -d mut=$SELECTION_STRENGTH $SLIM_FILE \
-        > $i.out & }
+        -d outfolder=\"$OUTFOLDER\" -d mut=$SELECTION_STRENGTH \
+        -d prefix=\"$PREFIX\" -s $i -d i=$i $SLIM_FILE > $i.out & }
 
 for (( i=0; i<$NUM_TREES; i++ ))
 do
