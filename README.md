@@ -1,4 +1,4 @@
-# slim_real_data_generation
+# slim_selection_simulation
 
 This repository is for generating synthetic genetic data, using the Messer Lab's SLiM application, under a flexible demography and with various strengths of selection. The end goal is to have four `.npy` arrays, named `matrices`, `matrices_regions`, `distances`, and `distances_regions` for use in the `slim_iterator` available in the Mathieson Lab's `disc-pg-gan` repository, and can be used in substitution of `msprime`-generated synthetic data or real genetic data. Unlike `msprime`, SLiM is able to simulate selection, and the nature of generating the data in advance and loading it into a data structure results in a constant runtime for lookups.
 
