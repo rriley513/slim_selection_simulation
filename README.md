@@ -7,10 +7,10 @@ To generate synthetic data in this repository, please first visit the Messer Lab
 1. Run `get_recos.py` with arguments of the path to your recombination rate data files, and the path to save a comma-separated list of recombination rates. Adjust the variable COUNT as needed. This should not take more than a few seconds.
 For example:
 ```
-python get_regions.py /data/genetic_map/ reco_rates.txt
+python get_recos.py /data/genetic_map/ reco_rates.txt
 ```
 
-2. Run `bash make_exp_trees.sh` with arguments in the following order: the recombination rates text file, the parameters `N1,N2,growth,T1,T2` for your SLiM simulation (comma-separated, no spaces), the path to the output folder, the path to the slim file, and the strength of selection (unused if no selection.) This may take several (or dozens) of hours, so it is recommended that these scripts are run in the background.
+2. Run `bash make_exp_trees.sh` with arguments in the following order: the recombination rates text file, the number of regions to simulate, the parameters `N1,N2,growth,T1,T2` for your SLiM simulation (comma-separated, no spaces), the path to the output folder, the output prefix, the path to the SLiM script, and the strength of selection (unused if no selection). This may take several (or dozens) of hours, so it is recommended that these scripts are run in the background.
 For example:
 ```
 bash make_exp_trees.sh 3000 ../reco_rates.txt 23231,29962,0.00531,4870,581 ../output/ YRI_neutral ../slim_scripts/exp_neutral.slim 0.0
