@@ -31,7 +31,7 @@ python process_trees.py -i all_yri_neutral_trees.txt -o YRI_neutral_3000 -r ../r
 
 python process_trees.py -i all_CEU_sel01_trees.txt -o CEU_sel01_600 -r ../reco_rates.txt --Ne 22552
 
-python process_trees.py -i all_CHB_sel05_trees.txt -o CHB_sel05_600 -r ../reco_rates.txt --Ne 24607
+python process_trees.py -i all_CHB_sel05_trees.txt -o CHB_sel05_600 -r ../reco_rates.txt --Ne 24609
 ```
 
 This will output four numpy files: `matrices_SUFFIX.npy`, `matrices_regions_SUFFIX.npy`, `distances_SUFFIX.npy`, and `distances_regions_SUFFIX.npy`, for use in `disc-pg-gan`'s `slim_iterator.py`.
